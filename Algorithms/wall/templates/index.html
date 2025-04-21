@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Навигация для незрячих</title>
+</head>
+<body>
+  <h1>Навигация со звуком</h1>
+  <button id="start">Старт</button>
+  <audio id="sound" src="{{ url_for('static', filename='enhanced_wall.wav') }}" loop></audio>
+
+  <script>
+    const sound = document.getElementById("sound");
+    let isPlaying = false;
+
+    document.getElementById("start").addEventListener("click", () => {
+      if (!isPlaying) {
+        sound.play();
+        isPlaying = true;
+        pollServer();
+      }
+    });
+
+    function pollServer() {
+      setInterval(async () => {
+        const res = await fetch("/status");
+        const data = await res.json();
+        if (data.collision) {
+          sound.volume = 1.0;
+        } else {
+          sound.volume = data.volume;
+        }
+      }, 300);
+    }
+  </script>
+</body>
+</html>
